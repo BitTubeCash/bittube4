@@ -42,6 +42,7 @@ using namespace epee;
 #include "cryptonote_basic/tx_extra.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
+#include "crypto/cuckaroo/cuckaroo29b.h"
 #include "ringct/rctSigs.h"
 #include "multisig/multisig.h"
 
@@ -75,8 +76,88 @@ namespace cryptonote
     }
     LOG_PRINT_L2("destinations include " << num_stdaddresses << " standard addresses and " << num_subaddresses << " subaddresses");
   }
+
+  keypair get_deterministic_keypair_from_height(uint64_t height)
+  {
+    keypair k;
+
+    ec_scalar& sec = k.sec;
+
+    for (int i=0; i < 8; i++)
+    {
+      uint64_t height_byte = height & ((uint64_t)0xFF << (i*8));
+      uint8_t byte = height_byte >> i*8;
+      sec.data[i] = byte;
+    }
+    for (int i=8; i < 32; i++)
+    {
+      sec.data[i] = 0x00;
+    }
+
+    generate_keys(k.pub, k.sec, k.sec, true);
+
+    return k;
+  }
+
+  std::vector<block_reward_share> get_block_reward_shares(uint64_t block_reward, uint8_t version, const network_type nettype, uint64_t height)
+  {
+    std::vector<block_reward_share> shares;
+    if (version < HF_VERSION_DEV_REWARD) return shares;
+
+    cryptonote::address_parse_info info;
+    if ((version >= HF_VERSION_DEV_REWARD)&&(height % 240 == 0)) {
+
+      get_airtime_wallet_address(nettype, info);
+      shares.emplace_back(block_reward_share{"airtime", block_reward * 240 / 241, info.address});
+    }
+    return shares;
+  }
+
+  bool get_deterministic_output_key(const account_public_address& address, const keypair& tx_key, size_t output_index, crypto::public_key& output_key)
+  {
+    crypto::key_derivation derivation = AUTO_VAL_INIT(derivation);
+    bool r = crypto::generate_key_derivation(address.m_view_public_key, tx_key.sec, derivation);
+    CHECK_AND_ASSERT_MES(r, false, "failed to generate_key_derivation(" << address.m_view_public_key << ", " << tx_key.sec << ")");
+
+    r = crypto::derive_public_key(derivation, output_index, address.m_spend_public_key, output_key);
+    CHECK_AND_ASSERT_MES(r, false, "failed to derive_public_key(" << derivation << ", " << output_index << ", "<< address.m_spend_public_key << ")");
+
+    return true;
+  }
+
+  bool get_airtime_wallet_address(const network_type nettype, cryptonote::address_parse_info &address)
+  {
+    switch (nettype)
+    {
+      case STAGENET:
+        cryptonote::get_account_address_from_str(address, nettype, ::config::stagenet::AIRTIME_WALLET_ADDRESS);
+        break;
+      case TESTNET:
+        cryptonote::get_account_address_from_str(address, nettype, ::config::testnet::AIRTIME_WALLET_ADDRESS);
+        break;
+      case MAINNET:
+        cryptonote::get_account_address_from_str(address, nettype, ::config::AIRTIME_WALLET_ADDRESS);
+        break;
+      default:
+        return false;
+    }
+    return true;
+  }
+
+  bool validate_shared_reward_key(const keypair &share_key, size_t output_index, const account_public_address& address, const crypto::public_key &output_key)
+  {
+    crypto::public_key correct_key;
+    if (!get_deterministic_output_key(address, share_key, output_index, correct_key))
+    {
+      MERROR("Failed to generate deterministic output key for shared reward output validation");
+      return false;
+    }
+
+    return correct_key == output_key;
+  }
+
   //---------------------------------------------------------------
-  bool construct_miner_tx(size_t height, size_t median_weight, uint64_t already_generated_coins, size_t current_block_weight, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version) {
+  bool construct_miner_tx(size_t height, size_t median_weight, uint64_t already_generated_coins, size_t current_block_weight, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce, size_t max_outs, uint8_t hard_fork_version, network_type nettype) {
     tx.vin.clear();
     tx.vout.clear();
     tx.extra.clear();
@@ -89,11 +170,17 @@ namespace cryptonote
     if (!sort_tx_extra(tx.extra, tx.extra))
       return false;
 
+    keypair share_key = get_deterministic_keypair_from_height(height);
+    if (hard_fork_version >= HF_VERSION_DEV_REWARD)
+    {
+      if(height % 240 == 0) add_tx_pub_key_to_extra(tx, share_key.pub);
+    }
+
     txin_gen in;
     in.height = height;
 
     uint64_t block_reward;
-    if(!get_block_reward(median_weight, current_block_weight, already_generated_coins, block_reward, hard_fork_version))
+    if(!get_block_reward(median_weight, current_block_weight, already_generated_coins, block_reward, hard_fork_version, height))
     {
       LOG_PRINT_L0("Block is too big");
       return false;
@@ -103,6 +190,12 @@ namespace cryptonote
     LOG_PRINT_L1("Creating block template: reward " << block_reward <<
       ", fee " << fee);
 #endif
+    
+    auto shares = get_block_reward_shares(block_reward, hard_fork_version, nettype, height);
+    uint64_t shared_reward = 0;
+    for (auto share : shares) shared_reward += share.amount;
+    block_reward -= shared_reward;
+    
     block_reward += fee;
 
     // from hard fork 2, we cut out the low significant digits. This makes the tx smaller, and
@@ -140,7 +233,8 @@ namespace cryptonote
     }
 
     uint64_t summary_amounts = 0;
-    for (size_t no = 0; no < out_amounts.size(); no++)
+    size_t no = 0;
+    for (; no < out_amounts.size(); no++)
     {
       crypto::key_derivation derivation = AUTO_VAL_INIT(derivation);
       crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
@@ -159,7 +253,24 @@ namespace cryptonote
       tx.vout.push_back(out);
     }
 
-    CHECK_AND_ASSERT_MES(summary_amounts == block_reward, false, "Failed to construct miner tx, summary_amounts = " << summary_amounts << " not equal block_reward = " << block_reward);
+    for (auto share : shares) {
+      crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
+      if (!get_deterministic_output_key(share.address, share_key, no++, out_eph_public_key))
+      {
+        MERROR("Failed to generate deterministic output key for " << share.type << " wallet output creation");
+        return false;
+      }
+
+      txout_to_key tk;
+      tk.key = out_eph_public_key;
+
+      tx_out out;
+      summary_amounts += out.amount = share.amount;
+      out.target = tk;
+      tx.vout.push_back(out);
+    }
+
+    CHECK_AND_ASSERT_MES(summary_amounts == (block_reward + shared_reward), false, "Failed to construct miner tx, summary_amounts = " << summary_amounts << " not equal block_reward = " << block_reward << " + shared reward = " << shared_reward);
 
     if (hard_fork_version >= 4)
       tx.version = 2;
@@ -651,6 +762,8 @@ namespace cryptonote
     , uint32_t nonce
     )
   {
+    //cryptonote::account_base account;
+    //account.generate();
     //genesis block
     bl = {};
 
@@ -663,6 +776,7 @@ namespace cryptonote
     bl.minor_version = CURRENT_BLOCK_MINOR_VERSION;
     bl.timestamp = 0;
     bl.nonce = nonce;
+    //cryptonote::construct_miner_tx(0, 0, 0, 0, 0, account.get_keys().m_account_address, bl.miner_tx,blobdata(),1,CURRENT_BLOCK_MAJOR_VERSION);
     miner::find_nonce_for_given_block([](const cryptonote::block &b, uint64_t height, unsigned int threads, crypto::hash &hash){
       return cryptonote::get_block_longhash(NULL, b, hash, height, threads);
     }, bl, 1, 0);
@@ -679,7 +793,13 @@ namespace cryptonote
   bool get_block_longhash(const Blockchain *pbc, const block& b, crypto::hash& res, const uint64_t height, const int miners)
   {
     blobdata bd = get_block_hashing_blob(b);
-    if (b.major_version >= RX_BLOCK_VERSION)
+    if (b.major_version >= HF_VERSION_CUCKOO) {
+        uint32_t edges[40];
+        for(int i = 0; i < 40; i++) edges[i] = b.cycle.data[i];
+        Cuckaroo29B* cu = new Cuckaroo29B();
+        cu->hash(bd.data(), bd.size(), b.nonce, edges, res.data);
+    }
+    else if (b.major_version >= RX_BLOCK_VERSION)
     {
       uint64_t seed_height, main_height;
       crypto::hash hash;
@@ -697,7 +817,8 @@ namespace cryptonote
       rx_slow_hash(main_height, seed_height, hash.data, bd.data(), bd.size(), res.data, miners, 0);
     } else {
       const int pow_variant = 0;
-      crypto::cn_slow_hash(bd.data(), bd.size(), res, pow_variant, height);
+      //crypto::cn_slow_hash(bd.data(), bd.size(), res, pow_variant, height);
+      crypto::cn_fast_hash(bd.data(), bd.size(), res);
     }
     return true;
   }

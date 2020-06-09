@@ -786,6 +786,7 @@ void BlockchainLMDB::add_block(const block& blk, size_t block_weight, uint64_t l
   bi.bi_diff_lo = (cumulative_difficulty & 0xffffffffffffffff).convert_to<uint64_t>();
   bi.bi_hash = blk_hash;
   bi.bi_cum_rct = num_rct_outs;
+  if (m_height > 0)
   if (blk.major_version >= 4)
   {
     uint64_t last_height = m_height-1;

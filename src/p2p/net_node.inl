@@ -603,16 +603,21 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (nettype == cryptonote::TESTNET)
     {
+      full_addrs.insert("139.162.211.9:25281");
     }
     else if (nettype == cryptonote::STAGENET)
     {
+      full_addrs.insert("139.162.211.9:25381");
     }
     else if (nettype == cryptonote::FAKECHAIN)
     {
     }
     else
     {
-      //full_addrs.insert("0.0.0.0:0");
+      full_addrs.insert("139.162.211.9:25181");
+      full_addrs.insert("seed1.bit.tube:25181");
+      full_addrs.insert("seed2.bit.tube:25181");
+      full_addrs.insert("seed3.bit.tube:25181");
     }
     return full_addrs;
   }

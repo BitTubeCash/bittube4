@@ -43,17 +43,17 @@
 #define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER          0
 #define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW            60
 #define CURRENT_TRANSACTION_VERSION                     2
-#define CURRENT_BLOCK_MAJOR_VERSION                     1
-#define CURRENT_BLOCK_MINOR_VERSION                     0
+#define CURRENT_BLOCK_MAJOR_VERSION                     9
+#define CURRENT_BLOCK_MINOR_VERSION                     9
 #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              60*60*2
 #define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE             10
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
 // MONEY_SUPPLY - total number coins to be generated
-#define MONEY_SUPPLY                                    ((uint64_t)(-1))
-#define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
-#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
+#define MONEY_SUPPLY                                    ((uint64_t)(1000000000000000000))
+#define EMISSION_SPEED_FACTOR_PER_MINUTE                (22)
+#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)5000000000) // 3 * pow(10, 11)
 
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    60000 //size of block (bytes) after which reward for block calculated using block size
@@ -62,7 +62,7 @@
 #define CRYPTONOTE_LONG_TERM_BLOCK_WEIGHT_WINDOW_SIZE   100000 // size in blocks of the long term block weight median window
 #define CRYPTONOTE_SHORT_TERM_BLOCK_WEIGHT_SURGE_FACTOR 50
 #define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
-#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                12
+#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                9
 // COIN - number of smallest units in one coin
 #define COIN                                            ((uint64_t)1000000000000) // pow(10, 12)
 
@@ -77,8 +77,8 @@
 #define ORPHANED_BLOCKS_MAX_COUNT                       100
 
 
-#define DIFFICULTY_TARGET_V2                            120  // seconds
-#define DIFFICULTY_TARGET_V1                            60  // seconds - before first fork
+#define DIFFICULTY_TARGET_V2                            15  // seconds
+#define DIFFICULTY_TARGET_V1                            15  // seconds - before first fork
 #define DIFFICULTY_WINDOW                               720 // blocks
 #define DIFFICULTY_LAG                                  15  // !!!
 #define DIFFICULTY_CUT                                  60  // timestamps to cut after sorting
@@ -144,7 +144,7 @@
 
 #define RPC_IP_FAILS_BEFORE_BLOCK                       3
 
-#define CRYPTONOTE_NAME                         "bitmonero"
+#define CRYPTONOTE_NAME                         "bittubecash"
 #define CRYPTONOTE_POOLDATA_FILENAME            "poolstate.bin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
@@ -155,6 +155,7 @@
 #define THREAD_STACK_SIZE                       5 * 1024 * 1024
 
 #define HF_VERSION_DYNAMIC_FEE                  4
+#define HF_VERSION_DEV_REWARD                   12
 #define HF_VERSION_MIN_MIXIN_4                  6
 #define HF_VERSION_MIN_MIXIN_6                  7
 #define HF_VERSION_MIN_MIXIN_10                 8
@@ -168,6 +169,7 @@
 #define HF_VERSION_REJECT_SIGS_IN_COINBASE      12
 #define HF_VERSION_ENFORCE_MIN_AGE              12
 #define HF_VERSION_EFFECTIVE_SHORT_TERM_MEDIAN_IN_PENALTY 12
+#define HF_VERSION_CUCKOO                       13
 
 #define PER_KB_FEE_QUANTIZATION_DECIMALS        8
 
@@ -192,17 +194,18 @@ namespace config
   uint64_t const DEFAULT_DUST_THRESHOLD = ((uint64_t)2000000000); // 2 * pow(10, 9)
   uint64_t const BASE_REWARD_CLAMP_THRESHOLD = ((uint64_t)100000000); // pow(10, 8)
 
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 18;
-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 19;
-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 42;
-  uint16_t const P2P_DEFAULT_PORT = 18080;
-  uint16_t const RPC_DEFAULT_PORT = 18081;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 18082;
+  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x256ea0;
+  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x276ea0;
+  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x2beea0;
+  uint16_t const P2P_DEFAULT_PORT = 25181;
+  uint16_t const RPC_DEFAULT_PORT = 25182;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 25183;
   boost::uuids::uuid const NETWORK_ID = { {
-      0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
+      0xc5 ,0xf8, 0x71, 0xde , 0xf7, 0x9b , 0x1f, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
+  std::string const GENESIS_TX = "023c01ff0001a7e7da85de0102035ac4e67e462af5ba383842d0ddc458591d988ec6408dc41dcfe82d327278d521010ae0e794a6e3873318b7a4be73e83674959e48d3613a7097431d68c09d214d1a00";
   uint32_t const GENESIS_NONCE = 10000;
+  std::string const AIRTIME_WALLET_ADDRESS = "Tubed9R5LRp2bNyf3qSK3HDm2wEp7ygMmRNHghwmoUAaUPsmRYdP1tKevrnz5e7ZssVNgSepTvNMkdqGVin4HU12E4bB9fMqcMB"; // view key 32e07929f050601d70ab1162b73b1c854a59f86314222ac9a4df2843aeb41208
 
   // Hash domain separators
   const char HASH_KEY_BULLETPROOF_EXPONENT[] = "bulletproof";
@@ -217,32 +220,36 @@ namespace config
 
   namespace testnet
   {
-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
-    uint16_t const P2P_DEFAULT_PORT = 28080;
-    uint16_t const RPC_DEFAULT_PORT = 28081;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x9f;
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x317a;
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x699a;
+    uint16_t const P2P_DEFAULT_PORT = 25281;
+    uint16_t const RPC_DEFAULT_PORT = 25282;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 25283;
     boost::uuids::uuid const NETWORK_ID = { {
-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x11
+        0xd1 ,0xf8, 0x71, 0xde , 0xf7, 0x9b , 0x1f, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
       } }; // Bender's daydream
-    std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
+    std::string const GENESIS_TX = "023c01ff0001a7e7da85de0102035ac4e67e462af5ba383842d0ddc458591d988ec6408dc41dcfe82d327278d521010ae0e794a6e3873318b7a4be73e83674959e48d3613a7097431d68c09d214d1a00";
     uint32_t const GENESIS_NONCE = 10001;
+    std::string const AIRTIME_WALLET_ADDRESS = "TbYUtNwz3j9T6rkV9np1g86vKADp9q1VKDhtMkYpFe6g97sp969srp6V8TuEQ8VW33ekPGBfP4jcNHU73s9QHsx91t2fNYDCV";
+    //never fossil wedge hashing cavernous dagger tribal foxes itself asylum piloted puddle runway welders gemstone sarcasm gimmick metro wagtail cogs ammo never stunning tilt tribal
   }
 
   namespace stagenet
   {
-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 24;
-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 25;
-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 36;
-    uint16_t const P2P_DEFAULT_PORT = 38080;
-    uint16_t const RPC_DEFAULT_PORT = 38081;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 38082;
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x99;
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x23fa;
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 0x5c1a;
+    uint16_t const P2P_DEFAULT_PORT = 25381;
+    uint16_t const RPC_DEFAULT_PORT = 25382;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 25383;
     boost::uuids::uuid const NETWORK_ID = { {
-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x12
+        0x70 ,0xf8, 0x71, 0xde , 0xf7, 0x9b , 0x1f, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
       } }; // Bender's daydream
-    std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302df5d56da0c7d643ddd1ce61901c7bdc5fb1738bfe39fbe69c28a3a7032729c0f2101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
+    std::string const GENESIS_TX = "023c01ff0001a7e7da85de0102035ac4e67e462af5ba383842d0ddc458591d988ec6408dc41dcfe82d327278d521010ae0e794a6e3873318b7a4be73e83674959e48d3613a7097431d68c09d214d1a00";
     uint32_t const GENESIS_NONCE = 10002;
+    std::string const AIRTIME_WALLET_ADDRESS = "SbMYCXHL3KVjWmz8f1aas3ZNCCmPgdEXWUViN6Ms1nmpMUKoWeQGQpDBse1v1w9C7z5pVP89zStbrYHkdu1nPqBf1ALGumYEd";
+    //lyrics inmate alumni syringe july noted tomorrow echo owner ocean frying friendly sowed dogs tulips toilet echo dozen tinted jeers cogs axes velvet website noted
   }
 }
 
@@ -313,3 +320,5 @@ namespace cryptonote
     }
   };
 }
+
+

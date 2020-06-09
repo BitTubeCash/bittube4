@@ -37,7 +37,27 @@
 namespace cryptonote
 {
   //---------------------------------------------------------------
-  bool construct_miner_tx(size_t height, size_t median_weight, uint64_t already_generated_coins, size_t current_block_weight, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce = blobdata(), size_t max_outs = 999, uint8_t hard_fork_version = 1);
+  bool construct_miner_tx(size_t height, size_t median_weight, uint64_t already_generated_coins, size_t current_block_weight, uint64_t fee, const account_public_address &miner_address, transaction& tx, const blobdata& extra_nonce = blobdata(), size_t max_outs = 999, uint8_t hard_fork_version = 1, network_type nettype = MAINNET);
+
+  keypair get_deterministic_keypair_from_height(uint64_t height);
+
+  struct block_reward_share {
+    const char *type;
+    const uint64_t amount;
+    const account_public_address address;
+  };
+  std::vector<block_reward_share> get_block_reward_shares(uint64_t block_reward, uint8_t version, const network_type nettype, uint64_t height);
+
+  bool get_deterministic_output_key(const account_public_address& address, const keypair& tx_key, size_t output_index, crypto::public_key& output_key);
+
+  bool get_development_wallet_address(const network_type nettype, address_parse_info &address);
+  bool get_marketing_wallet_address(const network_type nettype, address_parse_info &address);
+  bool get_airtime_wallet_address(const network_type nettype, address_parse_info &address);
+  bool get_community_devs_wallet_address(const network_type nettype, address_parse_info &address);
+  bool get_community_mods_wallet_address(const network_type nettype, address_parse_info &address);
+  bool get_community_ref_wallet_address(const network_type nettype, address_parse_info &address);
+
+  bool validate_shared_reward_key(const keypair &share_key, size_t output_index, const account_public_address &address, const crypto::public_key& output_key);
 
   struct tx_source_entry
   {

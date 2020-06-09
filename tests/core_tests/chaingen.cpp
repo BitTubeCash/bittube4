@@ -226,11 +226,11 @@ uint64_t test_generator::get_already_generated_coins(const cryptonote::block& bl
   return get_already_generated_coins(blk_hash);
 }
 
-void test_generator::add_block(const cryptonote::block& blk, size_t txs_weight, std::vector<size_t>& block_weights, uint64_t already_generated_coins, uint8_t hf_version)
+void test_generator::add_block(const cryptonote::block& blk, size_t txs_weight, std::vector<size_t>& block_weights, uint64_t already_generated_coins, uint8_t hf_version, uint64_t height)
 {
   const size_t block_weight = txs_weight + get_transaction_weight(blk.miner_tx);
   uint64_t block_reward;
-  get_block_reward(misc_utils::median(block_weights), block_weight, already_generated_coins, block_reward, hf_version);
+  get_block_reward(misc_utils::median(block_weights), block_weight, already_generated_coins, block_reward, hf_version, height);
   m_blocks_info[get_block_hash(blk)] = block_info(blk.prev_id, already_generated_coins + block_reward, block_weight);
 }
 
@@ -311,7 +311,7 @@ bool test_generator::construct_block(cryptonote::block& blk, uint64_t height, co
   //blk.tree_root_hash = get_tx_tree_hash(blk);
 
   fill_nonce(blk, get_test_difficulty(hf_ver), height);
-  add_block(blk, txs_weight, block_weights, already_generated_coins, hf_ver ? hf_ver.get() : 1);
+  add_block(blk, txs_weight, block_weights, already_generated_coins, hf_ver ? hf_ver.get() : 1, height);
 
   return true;
 }
@@ -376,7 +376,7 @@ bool test_generator::construct_block_manually(block& blk, const block& prev_bloc
   difficulty_type a_diffic = actual_params & bf_diffic ? diffic : get_test_difficulty(hf_version);
   fill_nonce(blk, a_diffic, height);
 
-  add_block(blk, txs_weight, block_weights, already_generated_coins, hf_version);
+  add_block(blk, txs_weight, block_weights, already_generated_coins, hf_version, height);
 
   return true;
 }
@@ -985,7 +985,7 @@ bool construct_miner_tx_manually(size_t height, uint64_t already_generated_coins
 
   // This will work, until size of constructed block is less then CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE
   uint64_t block_reward;
-  if (!get_block_reward(0, 0, already_generated_coins, block_reward, 1))
+  if (!get_block_reward(0, 0, already_generated_coins, block_reward, 1, height))
   {
     LOG_PRINT_L0("Block is too big");
     return false;

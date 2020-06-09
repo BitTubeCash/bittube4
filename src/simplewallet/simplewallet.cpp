@@ -91,9 +91,9 @@ typedef cryptonote::simple_wallet sw;
 
 #define EXTENDED_LOGS_FILE "wallet_details.log"
 
-#define DEFAULT_MIX 10
+#define DEFAULT_MIX 2
 
-#define MIN_RING_SIZE 11 // Used to inform user about min ring size -- does not track actual protocol
+#define MIN_RING_SIZE 3 // Used to inform user about min ring size -- does not track actual protocol
 
 #define OLD_AGE_WARN_THRESHOLD (30 * 86400 / DIFFICULTY_TARGET_V2) // 30 days
 
@@ -5191,6 +5191,8 @@ void simple_wallet::check_background_mining(const epee::wipeable_string &passwor
 
   if (setup == tools::wallet2::BackgroundMiningMaybe)
   {
+    m_wallet->setup_background_mining(tools::wallet2::BackgroundMiningNo);
+    /*
     message_writer() << tr("The daemon is not set up to background mine.");
     message_writer() << tr("With background mining enabled, the daemon will mine when idle and not on battery.");
     message_writer() << tr("Enabling this supports the network you are using, and makes you eligible for receiving new monero");
@@ -5202,8 +5204,9 @@ void simple_wallet::check_background_mining(const epee::wipeable_string &passwor
       return;
     }
     m_wallet->setup_background_mining(tools::wallet2::BackgroundMiningYes);
+    */
     m_wallet->rewrite(m_wallet_file, password);
-    start_background_mining();
+    //start_background_mining();
   }
   else
   {

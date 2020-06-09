@@ -972,7 +972,6 @@ namespace cryptonote
   {
     switch (decimal_point)
     {
-      case 12:
       case 9:
       case 6:
       case 3:
@@ -995,16 +994,14 @@ namespace cryptonote
       decimal_point = default_decimal_point;
     switch (decimal_point)
     {
-      case 12:
-        return "monero";
       case 9:
-        return "millinero";
+        return "monero";
       case 6:
-        return "micronero";
+        return "millinero";
       case 3:
-        return "nanonero";
+        return "micronero";
       case 0:
-        return "piconero";
+        return "nanonero";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << decimal_point);
     }
@@ -1234,10 +1231,25 @@ namespace cryptonote
   //---------------------------------------------------------------
   blobdata get_block_hashing_blob(const block& b)
   {
-    blobdata blob = t_serializable_object_to_blob(static_cast<block_header>(b));
+    blobdata blob;
+
+    if(b.major_version < HF_VERSION_CUCKOO)
+    {
+      blob = t_serializable_object_to_blob(static_cast<block_header>(b));
+    }
+    else
+    {
+      blob = t_serializable_object_to_blob(b.major_version);
+      blob.append(reinterpret_cast<const char*>(&b.minor_version), sizeof(b.minor_version));
+      blob.append(reinterpret_cast<const char*>(&b.timestamp), sizeof(b.timestamp));
+      blob.append(reinterpret_cast<const char*>(&b.prev_id), sizeof(b.prev_id));
+    }
     crypto::hash tree_root_hash = get_tx_tree_hash(b);
     blob.append(reinterpret_cast<const char*>(&tree_root_hash), sizeof(tree_root_hash));
     blob.append(tools::get_varint_data(b.tx_hashes.size()+1));
+    if (b.major_version >= HF_VERSION_CUCKOO) {
+        blob.append(reinterpret_cast<const char*>(&b.nonce8), sizeof(b.nonce8));
+    }
     return blob;
   }
   //---------------------------------------------------------------

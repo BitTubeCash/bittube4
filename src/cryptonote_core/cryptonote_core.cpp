@@ -1657,7 +1657,7 @@ namespace cryptonote
     m_txpool_auto_relayer.do_call(boost::bind(&core::relay_txpool_transactions, this));
     m_check_updates_interval.do_call(boost::bind(&core::check_updates, this));
     m_check_disk_space_interval.do_call(boost::bind(&core::check_disk_space, this));
-    m_block_rate_interval.do_call(boost::bind(&core::check_block_rate, this));
+    //m_block_rate_interval.do_call(boost::bind(&core::check_block_rate, this));
     m_blockchain_pruning_interval.do_call(boost::bind(&core::update_blockchain_pruning, this));
     m_miner.on_idle();
     m_mempool.on_idle();
