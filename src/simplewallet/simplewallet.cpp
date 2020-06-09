@@ -5450,7 +5450,7 @@ void simple_wallet::on_money_received(uint64_t height, const crypto::hash &txid,
     print_money(amount) << ", " <<
     tr("idx ") << subaddr_index;
 
-  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 1000000 : m_wallet->nettype() == STAGENET ? 50000 : 1650000;
+  const uint64_t warn_height = m_wallet->nettype() == TESTNET ? 0 : m_wallet->nettype() == STAGENET ? 0 : 0;
   if (height >= warn_height && !is_change)
   {
     std::vector<tx_extra_field> tx_extra_fields;

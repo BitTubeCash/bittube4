@@ -244,7 +244,7 @@ namespace cryptonote
     }
     else
     {
-      const int cn_variant = hashing_blob[0] >= 7 ? hashing_blob[0] - 6 : 0;
+      const int cn_variant = 0;
       crypto::cn_slow_hash(hashing_blob.data(), hashing_blob.size(), hash, cn_variant, cryptonote::get_block_height(block));
     }
     if (!check_hash(hash, m_diff))

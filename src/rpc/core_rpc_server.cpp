@@ -1285,7 +1285,7 @@ namespace cryptonote
     if (lMiner.is_mining() || lMiner.get_is_background_mining_enabled())
       res.address = get_account_address_as_str(nettype(), false, lMiningAdr);
     const uint8_t major_version = m_core.get_blockchain_storage().get_current_hard_fork_version();
-    const unsigned variant = major_version >= 7 ? major_version - 6 : 0;
+    const unsigned variant = 0;
     switch (variant)
     {
       case 0: res.pow_algorithm = "Cryptonight"; break;
