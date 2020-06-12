@@ -2617,6 +2617,8 @@ bool simple_wallet::set_unit(const std::vector<std::string> &args/* = std::vecto
 
   if (unit == "tube")
     decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT;
+  else if (unit == "millitube")
+    decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 3;
   else if (unit == "microtube")
     decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 6;
   else if (unit == "nanotube")

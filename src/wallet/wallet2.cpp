@@ -4703,7 +4703,7 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
  uint64_t wallet2::estimate_blockchain_height()
  {
    // ~num blocks per month
-   const uint64_t blocks_per_month = 8*60*60*24*30;
+   const uint64_t blocks_per_month = 4*60*24*30;
 
    // try asking the daemon first
    std::string err;

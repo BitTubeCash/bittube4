@@ -76,9 +76,9 @@ namespace {
       dir = dir.remove_filename();
       dir /= ".bittubecash/ringdb";
       if (nettype == cryptonote::TESTNET)
-        dir /= "testnet";
+        dir /= ".bittubecash/ringdb/testnet";
       else if (nettype == cryptonote::STAGENET)
-        dir /= "stagenet";
+        dir /= ".bittubecash/ringdb/stagenet";
       return dir.string();
     }
 

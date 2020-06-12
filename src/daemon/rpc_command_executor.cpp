@@ -526,7 +526,7 @@ bool t_rpc_command_executor::show_status() {
     % (ires.testnet ? "testnet" : ires.stagenet ? "stagenet" : "mainnet")
     % bootstrap_msg
     % (!has_mining_info ? "mining info unavailable" : mining_busy ? "syncing" : mres.active ? ( ( mres.is_background_mining_enabled ? "smart " : "" ) + std::string("mining at ") + get_mining_speed(mres.speed, hfres.version)) : "not mining")
-    % get_mining_speed(hfres.version >= HF_VERSION_CUCKOO ? (cryptonote::difficulty_type(ires.wide_difficulty) * 16 / ires.target) : (ires.difficulty / ires.target), hfres.version)
+    % get_mining_speed(hfres.version >= HF_VERSION_CUCKOO ? (cryptonote::difficulty_type(ires.wide_difficulty) * 40 / ires.target) : (ires.difficulty / ires.target), hfres.version)
     % (unsigned)hfres.version
     % get_fork_extra_info(hfres.earliest_height, net_height, ires.target)
     % (hfres.state == cryptonote::HardFork::Ready ? "up to date" : hfres.state == cryptonote::HardFork::UpdateNeeded ? "update needed" : "out of date, likely forked")
