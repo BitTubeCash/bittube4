@@ -124,8 +124,8 @@ int Cuckaroo29B::hash(const void* in, size_t len, uint32_t nonce, uint32_t *edge
 	if (retval == 0)
 	{
 	
-		uint8_t hashdata[116]; // PROOFSIZE*EDGEBITS/8
-		memset(hashdata, 0, 116);
+		uint8_t hashdata[145]; // PROOFSIZE*EDGEBITS/8
+		memset(hashdata, 0, 145);
 
 		int bytepos = 0;
 		int bitpos = 0;
@@ -147,7 +147,7 @@ int Cuckaroo29B::hash(const void* in, size_t len, uint32_t nonce, uint32_t *edge
 
 		blake2b_state S[1];
 		blake2b_init( S, 32 );
-		blake2b_update( S, ( const uint8_t * )hashdata, 116 );
+		blake2b_update( S, ( const uint8_t * )hashdata, 145 );
 		blake2b_final( S, cyclehash, 32 );
 	
 		for(int i = 0; i < 32; i++)
