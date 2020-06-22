@@ -1830,6 +1830,8 @@ namespace cryptonote
       error_resp.message = "Block not accepted";
       return false;
     }
+    crypto::hash blockhash = get_block_hash(b);
+    res.hash = epee::string_tools::pod_to_hex(blockhash);
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
