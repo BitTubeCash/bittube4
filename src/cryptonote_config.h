@@ -51,7 +51,7 @@
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
 // MONEY_SUPPLY - total number coins to be generated
-#define MONEY_SUPPLY                                    ((uint64_t)(1000000000000000000))
+#define MONEY_SUPPLY                                    ((uint64_t)(600000000000000000))
 #define EMISSION_SPEED_FACTOR_PER_MINUTE                (22)
 #define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)5000000000) // 3 * pow(10, 11)
 
@@ -95,7 +95,7 @@
 
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  //by default, blocks ids count in synchronizing
 #define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_PRE_V4       100    //by default, blocks count in blocks downloading
-#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              20     //by default, blocks count in blocks downloading
+#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              100     //by default, blocks count in blocks downloading
 #define BLOCKS_SYNCHRONIZING_MAX_COUNT                  2048   //must be a power of 2, greater than 128, equal to SEEDHASH_EPOCH_BLOCKS
 
 #define CRYPTONOTE_MEMPOOL_TX_LIVETIME                    (86400*3) //seconds, three days
@@ -203,7 +203,7 @@ namespace config
   boost::uuids::uuid const NETWORK_ID = { {
       0xc5 ,0xf8, 0x71, 0xde , 0xf7, 0x9b , 0x1f, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "023c01ff0001a7e7da85de0102035ac4e67e462af5ba383842d0ddc458591d988ec6408dc41dcfe82d327278d521010ae0e794a6e3873318b7a4be73e83674959e48d3613a7097431d68c09d214d1a00";
+  std::string const GENESIS_TX = "023c01ff0001b1a4839d8501020eca551ff1857d803a2e437061fe75d1470cc6b6fc34376e0fc0b08a56d3cdc421018c9f8d7f22b2f1c4bc984bc1b82b9a75e7557de950194ddfc6c070220dbf861800";
   uint32_t const GENESIS_NONCE = 10000;
   std::string const AIRTIME_WALLET_ADDRESS = "Tubed9R5LRp2bNyf3qSK3HDm2wEp7ygMmRNHghwmoUAaUPsmRYdP1tKevrnz5e7ZssVNgSepTvNMkdqGVin4HU12E4bB9fMqcMB"; // view key 32e07929f050601d70ab1162b73b1c854a59f86314222ac9a4df2843aeb41208
 
@@ -229,7 +229,7 @@ namespace config
     boost::uuids::uuid const NETWORK_ID = { {
         0xd1 ,0xf8, 0x71, 0xde , 0xf7, 0x9b , 0x1f, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
       } }; // Bender's daydream
-    std::string const GENESIS_TX = "023c01ff0001a7e7da85de0102035ac4e67e462af5ba383842d0ddc458591d988ec6408dc41dcfe82d327278d521010ae0e794a6e3873318b7a4be73e83674959e48d3613a7097431d68c09d214d1a00";
+    std::string const GENESIS_TX = "023c01ff0001b1a4839d8501020eca551ff1857d803a2e437061fe75d1470cc6b6fc34376e0fc0b08a56d3cdc421018c9f8d7f22b2f1c4bc984bc1b82b9a75e7557de950194ddfc6c070220dbf861800";
     uint32_t const GENESIS_NONCE = 10001;
     std::string const AIRTIME_WALLET_ADDRESS = "TbYUtNwz3j9T6rkV9np1g86vKADp9q1VKDhtMkYpFe6g97sp969srp6V8TuEQ8VW33ekPGBfP4jcNHU73s9QHsx91t2fNYDCV";
     //never fossil wedge hashing cavernous dagger tribal foxes itself asylum piloted puddle runway welders gemstone sarcasm gimmick metro wagtail cogs ammo never stunning tilt tribal
@@ -246,7 +246,7 @@ namespace config
     boost::uuids::uuid const NETWORK_ID = { {
         0x70 ,0xf8, 0x71, 0xde , 0xf7, 0x9b , 0x1f, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
       } }; // Bender's daydream
-    std::string const GENESIS_TX = "023c01ff0001a7e7da85de0102035ac4e67e462af5ba383842d0ddc458591d988ec6408dc41dcfe82d327278d521010ae0e794a6e3873318b7a4be73e83674959e48d3613a7097431d68c09d214d1a00";
+    std::string const GENESIS_TX = "023c01ff0001b1a4839d8501020eca551ff1857d803a2e437061fe75d1470cc6b6fc34376e0fc0b08a56d3cdc421018c9f8d7f22b2f1c4bc984bc1b82b9a75e7557de950194ddfc6c070220dbf861800";
     uint32_t const GENESIS_NONCE = 10002;
     std::string const AIRTIME_WALLET_ADDRESS = "SbMYCXHL3KVjWmz8f1aas3ZNCCmPgdEXWUViN6Ms1nmpMUKoWeQGQpDBse1v1w9C7z5pVP89zStbrYHkdu1nPqBf1ALGumYEd";
     //lyrics inmate alumni syringe july noted tomorrow echo owner ocean frying friendly sowed dogs tulips toilet echo dozen tinted jeers cogs axes velvet website noted
