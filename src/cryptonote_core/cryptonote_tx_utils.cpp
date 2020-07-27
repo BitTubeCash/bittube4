@@ -798,6 +798,7 @@ namespace cryptonote
         for(int i = 0; i < 40; i++) edges[i] = b.cycle.data[i];
         Cuckaroo29B* cu = new Cuckaroo29B();
         cu->hash(bd.data(), bd.size(), b.nonce, edges, res.data);
+        delete cu;
     }
     else if (b.major_version >= RX_BLOCK_VERSION)
     {
