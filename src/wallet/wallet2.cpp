@@ -103,9 +103,9 @@ using namespace cryptonote;
 // used to target a given block weight (additional outputs may be added on top to build fee)
 #define TX_WEIGHT_TARGET(bytes) (bytes*2/3)
 
-#define UNSIGNED_TX_PREFIX "Monero unsigned tx set\005"
-#define SIGNED_TX_PREFIX "Monero signed tx set\005"
-#define MULTISIG_UNSIGNED_TX_PREFIX "Monero multisig unsigned tx set\001"
+#define UNSIGNED_TX_PREFIX "BitTubeCash unsigned tx set\005"
+#define SIGNED_TX_PREFIX "BitTubeCash signed tx set\005"
+#define MULTISIG_UNSIGNED_TX_PREFIX "BitTubeCash multisig unsigned tx set\001"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_DAYS (1.8) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)
@@ -119,11 +119,11 @@ using namespace cryptonote;
 #define SUBADDRESS_LOOKAHEAD_MAJOR 50
 #define SUBADDRESS_LOOKAHEAD_MINOR 200
 
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Monero key image export\003"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "BitTubeCash key image export\003"
 
-#define MULTISIG_EXPORT_FILE_MAGIC "Monero multisig export\001"
+#define MULTISIG_EXPORT_FILE_MAGIC "BitTubeCash multisig export\001"
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Monero output export\004"
+#define OUTPUT_EXPORT_FILE_MAGIC "BitTubeCash output export\004"
 
 #define SEGREGATION_FORK_HEIGHT 99999999
 #define TESTNET_SEGREGATION_FORK_HEIGHT 99999999
@@ -145,7 +145,7 @@ using namespace cryptonote;
 static const std::string MULTISIG_SIGNATURE_MAGIC = "SigMultisigPkV1";
 static const std::string MULTISIG_EXTRA_INFO_MAGIC = "MultisigxV1";
 
-static const std::string ASCII_OUTPUT_MAGIC = "MoneroAsciiDataV1";
+static const std::string ASCII_OUTPUT_MAGIC = "BitTubeCashAsciiDataV1";
 
 boost::mutex tools::wallet2::default_daemon_address_lock;
 std::string tools::wallet2::default_daemon_address = "";
@@ -157,7 +157,7 @@ namespace
     boost::filesystem::path dir = tools::get_default_data_dir();
     // remove .bitmonero, replace with .shared-ringdb
     dir = dir.remove_filename();
-    dir /= ".shared-ringdb";
+    dir /= ".bittubecash/.ringdb";
     return dir.string();
   }
 
@@ -1804,8 +1804,8 @@ void wallet2::scan_output(const cryptonote::transaction &tx, bool miner_tx, cons
     if (!m_encrypt_keys_after_refresh)
     {
       boost::optional<epee::wipeable_string> pwd = m_callback->on_get_password(pool ? "output found in pool" : "output received");
-      THROW_WALLET_EXCEPTION_IF(!pwd, error::password_needed, tr("Password is needed to compute key image for incoming monero"));
-      THROW_WALLET_EXCEPTION_IF(!verify_password(*pwd), error::password_needed, tr("Invalid password: password is needed to compute key image for incoming monero"));
+      THROW_WALLET_EXCEPTION_IF(!pwd, error::password_needed, tr("Password is needed to compute key image for incoming TUBE"));
+      THROW_WALLET_EXCEPTION_IF(!verify_password(*pwd), error::password_needed, tr("Invalid password: password is needed to compute key image for incoming TUBE"));
       decrypt_keys(*pwd);
       m_encrypt_keys_after_refresh = *pwd;
     }
@@ -3342,7 +3342,6 @@ void wallet2::refresh(bool trusted_daemon, uint64_t start_height, uint64_t & blo
   uint64_t blocks_start_height;
   std::vector<cryptonote::block_complete_entry> blocks;
   std::vector<parsed_block> parsed_blocks;
-  bool refreshed = false;
   std::shared_ptr<std::map<std::pair<uint64_t, uint64_t>, size_t>> output_tracker_cache;
   hw::device &hwdev = m_account.get_device();
 
@@ -3404,7 +3403,6 @@ void wallet2::refresh(bool trusted_daemon, uint64_t start_height, uint64_t & blo
       if (!first && blocks.empty())
       {
         m_node_rpc_proxy.set_height(m_blockchain.size());
-        refreshed = true;
         break;
       }
       if (!last)
@@ -3450,7 +3448,6 @@ void wallet2::refresh(bool trusted_daemon, uint64_t start_height, uint64_t & blo
       if(!first && blocks_start_height == next_blocks_start_height)
       {
         m_node_rpc_proxy.set_height(m_blockchain.size());
-        refreshed = true;
         break;
       }
 
@@ -4722,11 +4719,8 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const epee::wip
 
  uint64_t wallet2::estimate_blockchain_height()
  {
-   // -1 month for fluctuations in block time and machine date/time setup.
-   // avg seconds per block
-   const int seconds_per_block = DIFFICULTY_TARGET_V2;
    // ~num blocks per month
-   const uint64_t blocks_per_month = 60*60*24*30/seconds_per_block;
+   const uint64_t blocks_per_month = 4*60*24*30;
 
    // try asking the daemon first
    std::string err;
@@ -7496,7 +7490,7 @@ int wallet2::get_fee_algorithm()
 uint64_t wallet2::get_min_ring_size()
 {
   if (use_fork_rules(8, 10))
-    return 11;
+    return 3;
   if (use_fork_rules(7, 10))
     return 7;
   if (use_fork_rules(6, 10))
@@ -7509,7 +7503,7 @@ uint64_t wallet2::get_min_ring_size()
 uint64_t wallet2::get_max_ring_size()
 {
   if (use_fork_rules(8, 10))
-    return 11;
+    return 3;
   return 0;
 }
 //------------------------------------------------------------------------------------------------------------------------------
@@ -12115,19 +12109,20 @@ uint64_t wallet2::get_daemon_blockchain_target_height(string &err)
 uint64_t wallet2::get_approximate_blockchain_height() const
 {
   // time of v2 fork
-  const time_t fork_time = m_nettype == TESTNET ? 1448285909 : m_nettype == STAGENET ? 1520937818 : 1458748658;
+  //const time_t fork_time = m_nettype == TESTNET ? 1448285909 : m_nettype == STAGENET ? 1520937818 : 1458748658;
   // v2 fork block
-  const uint64_t fork_block = m_nettype == TESTNET ? 624634 : m_nettype == STAGENET ? 32000 : 1009827;
+  //const uint64_t fork_block = m_nettype == TESTNET ? 624634 : m_nettype == STAGENET ? 32000 : 1009827;
   // avg seconds per block
-  const int seconds_per_block = DIFFICULTY_TARGET_V2;
+  //const int seconds_per_block = DIFFICULTY_TARGET_V2;
   // Calculated blockchain height
-  uint64_t approx_blockchain_height = fork_block + (time(NULL) - fork_time)/seconds_per_block;
+  //uint64_t approx_blockchain_height = fork_block + (time(NULL) - fork_time)/seconds_per_block;
   // testnet got some huge rollbacks, so the estimation is way off
-  static const uint64_t approximate_testnet_rolled_back_blocks = 303967;
-  if (m_nettype == TESTNET && approx_blockchain_height > approximate_testnet_rolled_back_blocks)
-    approx_blockchain_height -= approximate_testnet_rolled_back_blocks;
-  LOG_PRINT_L2("Calculated blockchain height: " << approx_blockchain_height);
-  return approx_blockchain_height;
+  //static const uint64_t approximate_testnet_rolled_back_blocks = 303967;
+  //if (m_nettype == TESTNET && approx_blockchain_height > approximate_testnet_rolled_back_blocks)
+  //  approx_blockchain_height -= approximate_testnet_rolled_back_blocks;
+  //LOG_PRINT_L2("Calculated blockchain height: " << approx_blockchain_height);
+  //ck + (time(NULL) - fork_time)/seconds_per_block
+  return (time(NULL) - 1596065210)/15;
 }
 
 void wallet2::set_tx_note(const crypto::hash &txid, const std::string &note)
@@ -13552,7 +13547,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
     }
   }
 
-  std::string uri = "monero:" + address;
+  std::string uri = "bittubecash:" + address;
   unsigned int n_fields = 0;
 
   if (!payment_id.empty())
@@ -13581,13 +13576,13 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 //----------------------------------------------------------------------------------------------------
 bool wallet2::parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error)
 {
-  if (uri.substr(0, 7) != "monero:")
+  if (uri.substr(0, 12) != "bittubecash:")
   {
-    error = std::string("URI has wrong scheme (expected \"monero:\"): ") + uri;
+    error = std::string("URI has wrong scheme (expected \"bittubecash:\"): ") + uri;
     return false;
   }
 
-  std::string remainder = uri.substr(7);
+  std::string remainder = uri.substr(12);
   const char *ptr = strchr(remainder.c_str(), '?');
   address = ptr ? remainder.substr(0, ptr-remainder.c_str()) : remainder;
 
@@ -13903,7 +13898,7 @@ mms::multisig_wallet_state wallet2::get_multisig_wallet_state() const
   state.num_transfer_details = m_transfers.size();
   if (state.multisig)
   {
-    THROW_WALLET_EXCEPTION_IF(!m_original_keys_available, error::wallet_internal_error, "MMS use not possible because own original Monero address not available");
+    THROW_WALLET_EXCEPTION_IF(!m_original_keys_available, error::wallet_internal_error, "MMS use not possible because own original BitTubeCash address not available");
     state.address = m_original_address;
     state.view_secret_key = m_original_view_secret_key;
   }

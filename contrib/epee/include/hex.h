@@ -52,7 +52,7 @@ namespace epee
     static std::array<char, N * 2> array(const std::array<std::uint8_t, N>& src) noexcept
     {
       std::array<char, N * 2> out;
-      static_assert(N <= 128, "keep the stack size down");
+      static_assert(N <= 256, "keep the stack size down");
       buffer_unchecked(out.data(), {src.data(), src.size()});
       return out;
     }
@@ -62,7 +62,7 @@ namespace epee
     static std::array<char, sizeof(T) * 2> array(const T& src) noexcept
     {
       std::array<char, sizeof(T) * 2> out;
-      static_assert(sizeof(T) <= 128, "keep the stack size down");
+      static_assert(sizeof(T) <= 256, "keep the stack size down");
       buffer_unchecked(out.data(), as_byte_span(src));
       return out;
     }

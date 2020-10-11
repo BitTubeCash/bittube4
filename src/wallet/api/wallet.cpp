@@ -74,11 +74,11 @@ namespace {
       boost::filesystem::path dir = tools::get_default_data_dir();
       // remove .bitmonero, replace with .shared-ringdb
       dir = dir.remove_filename();
-      dir /= ".shared-ringdb";
+      dir /= ".bittubecash/ringdb";
       if (nettype == cryptonote::TESTNET)
-        dir /= "testnet";
+        dir /= ".bittubecash/ringdb/testnet";
       else if (nettype == cryptonote::STAGENET)
-        dir /= "stagenet";
+        dir /= ".bittubecash/ringdb/stagenet";
       return dir.string();
     }
 

@@ -27,6 +27,9 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 set(crypto_sources
+  cuckaroo/solver/mean.cpp
+  cuckaroo/cuckaroo29b.cpp
+  cuckaroo/blake2b-ref.c
   aesb.c
   blake256.c
   chacha.c
@@ -59,6 +62,18 @@ include_directories(${RANDOMX_INCLUDE})
 set(crypto_headers)
 
 set(crypto_private_headers
+  cuckaroo/solver/barrier.hpp
+  cuckaroo/solver/bitmap.hpp
+  cuckaroo/solver/compress.hpp
+  cuckaroo/solver/cuckaroo.hpp
+  cuckaroo/solver/graph.hpp
+  cuckaroo/solver/mean.hpp
+  cuckaroo/solver/siphash.hpp
+  cuckaroo/cuckaroo29b.h
+  cuckaroo/blake2.h
+  cuckaroo/blake2-impl.h
+  cuckaroo/int-util.h
+  cuckaroo/portable_endian.h
   blake256.h
   chacha.h
   crypto-ops.h

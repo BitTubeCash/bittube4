@@ -395,13 +395,21 @@ static void get_metric_prefix(cryptonote::difficulty_type hr, double& hr_d, char
   prefix = 0;
 }
 
-static std::string get_mining_speed(cryptonote::difficulty_type hr)
+static std::string get_mining_speed(cryptonote::difficulty_type hr,uint16_t hf)
 {
   double hr_d;
   char prefix;
   get_metric_prefix(hr, hr_d, prefix);
-  if (prefix == 0) return (boost::format("%.0f H/s") % hr).str();
-  return (boost::format("%.2f %cH/s") % hr_d % prefix).str();
+  if(hf >= HF_VERSION_CUCKOO)
+  {
+    if (prefix == 0) return (boost::format("%.0f G/s") % hr).str();
+    return (boost::format("%.2f %cG/s") % hr_d % prefix).str();
+  }
+  else
+  {
+    if (prefix == 0) return (boost::format("%.0f H/s") % hr).str();
+    return (boost::format("%.2f %cH/s") % hr_d % prefix).str();
+  }
 }
 
 static std::string get_fork_extra_info(uint64_t t, uint64_t now, uint64_t block_time)
@@ -517,8 +525,8 @@ bool t_rpc_command_executor::show_status() {
     % get_sync_percentage(ires)
     % (ires.testnet ? "testnet" : ires.stagenet ? "stagenet" : "mainnet")
     % bootstrap_msg
-    % (!has_mining_info ? "mining info unavailable" : mining_busy ? "syncing" : mres.active ? ( ( mres.is_background_mining_enabled ? "smart " : "" ) + std::string("mining at ") + get_mining_speed(mres.speed)) : "not mining")
-    % get_mining_speed(cryptonote::difficulty_type(ires.wide_difficulty) / ires.target)
+    % (!has_mining_info ? "mining info unavailable" : mining_busy ? "syncing" : mres.active ? ( ( mres.is_background_mining_enabled ? "smart " : "" ) + std::string("mining at ") + get_mining_speed(mres.speed, hfres.version)) : "not mining")
+    % get_mining_speed(hfres.version >= HF_VERSION_CUCKOO ? (cryptonote::difficulty_type(ires.wide_difficulty) * 40 / ires.target) : (ires.difficulty / ires.target), hfres.version)
     % (unsigned)hfres.version
     % get_fork_extra_info(hfres.earliest_height, net_height, ires.target)
     % (unsigned)ires.outgoing_connections_count
@@ -544,6 +552,7 @@ bool t_rpc_command_executor::show_status() {
 bool t_rpc_command_executor::mining_status() {
   cryptonote::COMMAND_RPC_MINING_STATUS::request mreq;
   cryptonote::COMMAND_RPC_MINING_STATUS::response mres;
+  cryptonote::COMMAND_RPC_HARD_FORK_INFO::response hfres;
   epee::json_rpc::error error_resp;
   bool has_mining_info = true;
 
@@ -586,7 +595,7 @@ bool t_rpc_command_executor::mining_status() {
   }
   else
   {
-    tools::msg_writer() << "Mining at " << get_mining_speed(mres.speed) << " with " << mres.threads_count << " threads";
+    tools::msg_writer() << "Mining at " << get_mining_speed(mres.speed, hfres.version) << " with " << mres.threads_count << " threads";
   }
 
   tools::msg_writer() << "PoW algorithm: " << mres.pow_algorithm;
@@ -610,8 +619,8 @@ bool t_rpc_command_executor::mining_status() {
     uint64_t daily = 86400ull / mres.block_target * mres.block_reward * ratio;
     uint64_t monthly = 86400ull / mres.block_target * 30.5 * mres.block_reward * ratio;
     uint64_t yearly = 86400ull / mres.block_target * 356 * mres.block_reward * ratio;
-    tools::msg_writer() << "Expected: " << cryptonote::print_money(daily) << " monero daily, "
-        << cryptonote::print_money(monthly) << " monero monthly, " << cryptonote::print_money(yearly) << " yearly";
+    tools::msg_writer() << "Expected: " << cryptonote::print_money(daily) << " TUBE daily, "
+        << cryptonote::print_money(monthly) << " TUBE monthly, " << cryptonote::print_money(yearly) << " yearly";
   }
 
   return true;
@@ -1456,10 +1465,10 @@ bool t_rpc_command_executor::print_status()
   bool daemon_is_alive = m_rpc_client->check_connection();
 
   if(daemon_is_alive) {
-    tools::success_msg_writer() << "monerod is running";
+    tools::success_msg_writer() << "bittubecashd is running";
   }
   else {
-    tools::fail_msg_writer() << "monerod is NOT running";
+    tools::fail_msg_writer() << "bittubecashd is NOT running";
   }
 
   return true;
@@ -2467,6 +2476,7 @@ bool t_rpc_command_executor::rpc_payments()
 {
     cryptonote::COMMAND_RPC_ACCESS_DATA::request req;
     cryptonote::COMMAND_RPC_ACCESS_DATA::response res;
+    cryptonote::COMMAND_RPC_HARD_FORK_INFO::response hfres;
     std::string fail_message = "Unsuccessful";
     epee::json_rpc::error error_resp;
 
@@ -2499,7 +2509,7 @@ bool t_rpc_command_executor::rpc_payments()
       balance += entry.balance;
     }
     tools::msg_writer() << res.entries.size() << " clients with a total of " << balance << " credits";
-    tools::msg_writer() << "Aggregated client hash rate: " << get_mining_speed(res.hashrate);
+    tools::msg_writer() << "Aggregated client hash rate: " << get_mining_speed(res.hashrate, hfres.version);
 
     return true;
 }

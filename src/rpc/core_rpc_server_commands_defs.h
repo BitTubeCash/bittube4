@@ -940,8 +940,11 @@ namespace cryptonote
     
     struct response_t: public rpc_response_base
     {
+      std::string hash;
+
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE_PARENT(rpc_response_base)
+        KV_SERIALIZE(hash)
       END_KV_SERIALIZE_MAP()
     };
     typedef epee::misc_utils::struct_init<response_t> response;

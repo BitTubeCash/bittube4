@@ -1835,6 +1835,8 @@ namespace cryptonote
       error_resp.message = "Block not accepted";
       return false;
     }
+    crypto::hash blockhash = get_block_hash(b);
+    res.hash = epee::string_tools::pod_to_hex(blockhash);
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -2703,7 +2705,7 @@ namespace cryptonote
       return true;
     }
 
-    static const char software[] = "monero";
+    static const char software[] = "bittubecash";
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
     static const char subdir[] = "cli";

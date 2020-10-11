@@ -41,6 +41,8 @@
 #include <windows.h>
 #endif
 
+void c29_find_edges(const void*, size_t, uint32_t, uint32_t*);
+
 namespace cryptonote
 {
 

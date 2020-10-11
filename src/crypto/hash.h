@@ -45,6 +45,10 @@ namespace crypto {
   }
 
 #pragma pack(push, 1)
+  POD_CLASS cycle {
+    public:
+    uint32_t data[40];
+  };
   POD_CLASS hash {
     char data[HASH_SIZE];
   };
@@ -91,6 +95,8 @@ namespace crypto {
 
   constexpr static crypto::hash null_hash = {};
   constexpr static crypto::hash8 null_hash8 = {};
+
+  void c29_find_edges(const void*, size_t, uint32_t, uint32_t*);
 }
 
 CRYPTO_MAKE_HASHABLE(hash)

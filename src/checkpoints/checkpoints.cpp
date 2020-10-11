@@ -188,7 +188,8 @@ namespace cryptonote
     {
       return true;
     }
-    //ADD_CHECKPOINT(1,     "771fbcd656ec1464d3a02ead5e18644030007a0fc664c0a964d30922821a8148");
+    ADD_CHECKPOINT(300,     "13db2d8a73ef9ef8fa850dcec8e8bb6135878745e759674ad0f7637c2b3dba60");
+    ADD_CHECKPOINT(301,     "80cf514e3908553b9dfd2b4f1c6d2cafdc412148c3f7ece747818812084efd05");
     return true;
   }
 
