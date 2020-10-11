@@ -150,7 +150,7 @@ bool wallet2::search_for_rpc_payment(uint64_t credits_target, const std::functio
     }
     else
     {
-      int cn_variant = hashing_blob[0] >= 7 ? hashing_blob[0] - 6 : 0;
+      int cn_variant = 0;
       crypto::cn_slow_hash(hashing_blob.data(), hashing_blob.size(), hash, cn_variant, height);
     }
     ++n_hashes;

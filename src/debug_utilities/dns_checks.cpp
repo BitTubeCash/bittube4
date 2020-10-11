@@ -129,11 +129,11 @@ int main(int argc, char* argv[])
   mlog_configure("", true);
   mlog_set_categories("+" MONERO_DEFAULT_LOG_CATEGORY ":INFO");
 
-  lookup(LOOKUP_A, {"seeds.moneroseeds.se", "seeds.moneroseeds.ae.org", "seeds.moneroseeds.ch", "seeds.moneroseeds.li"});
+  lookup(LOOKUP_A, {});
 
-  lookup(LOOKUP_TXT, {"updates.moneropulse.org", "updates.moneropulse.net", "updates.moneropulse.co", "updates.moneropulse.se"});
+  lookup(LOOKUP_TXT, {});
 
-  lookup(LOOKUP_TXT, {"checkpoints.moneropulse.org", "checkpoints.moneropulse.net", "checkpoints.moneropulse.co", "checkpoints.moneropulse.se"});
+  lookup(LOOKUP_TXT, {});
 
   // those are in the code, but don't seem to actually exist
 #if 0
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
   lookup(LOOKUP_TXT, {"stagenetpoints.moneropulse.org", "stagenetpoints.moneropulse.net", "stagenetpoints.moneropulse.co", "stagenetpoints.moneropulse.se"});
 #endif
 
-  lookup(LOOKUP_TXT, {"segheights.moneropulse.org", "segheights.moneropulse.net", "segheights.moneropulse.co", "segheights.moneropulse.se"});
+  lookup(LOOKUP_TXT, {});
 
   return 0;
   CATCH_ENTRY_L0("main", 1);
