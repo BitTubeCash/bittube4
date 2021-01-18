@@ -854,6 +854,24 @@ struct Wallet
                                                    std::set<uint32_t> subaddr_indices = {}) = 0;
 
     /*!
+     * \brief createWtubeTransaction creates transaction. 
+     * \param dst_addr          destination ethaddress as string
+     * \param amount            amount
+     * \param mixin_count       mixin count. if 0 passed, wallet will use default value
+     * \param subaddr_account   subaddress account from which the input funds are taken
+     * \param subaddr_indices   set of subaddress indices to use for transfer or sweeping. if set empty, all are chosen when sweeping, and one or more are automatically chosen when transferring. after execution, returns the set of actually used indices
+     * \param priority
+     * \return                  PendingTransaction object. caller is responsible to check PendingTransaction::status()
+     *                          after object returned
+     */
+
+    virtual PendingTransaction * createWtubeTransaction(const std::string &dst_addr,
+                                                   optional<uint64_t> amount, uint32_t mixin_count,
+                                                   PendingTransaction::Priority = PendingTransaction::Priority_Low,
+                                                   uint32_t subaddr_account = 0,
+                                                   std::set<uint32_t> subaddr_indices = {}) = 0;
+
+    /*!
      * \brief createSweepUnmixableTransaction creates transaction with unmixable outputs.
      * \return                  PendingTransaction object. caller is responsible to check PendingTransaction::status()
      *                          after object returned
