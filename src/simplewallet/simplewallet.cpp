@@ -6978,6 +6978,35 @@ bool simple_wallet::transfer_wtube(const std::vector<std::string> &args_)
     {
       r = cryptonote::get_account_address_from_str_or_url(info, m_wallet->nettype(), "Tubed5ccWM6XGs6MugRteq8CiTVrLzM1HZAACLLsP9h53JvTYYcsvdq7dqurFZJWrKYjjxiieKn1XSxuHF8skFMSdtksnX5y5Jr", oa_prompter);
       add_extra_nonce_to_tx_extra(extra, "A"+local_args[i]);
+      bool valid = true;
+      if(local_args[i].length() != 42) {
+        valid = false;
+      }
+      else if((int)local_args[i].at(0) != 48){
+        valid = false;
+      }
+      else if((int)local_args[i].at(1) != 120){
+        valid = false;
+      }
+      else {
+        for(unsigned int j = 2; j < 42 ; j++){
+          unsigned int testchar = (unsigned int)local_args[i].at(j);
+          if(
+            testchar == 48 || testchar == 49 ||testchar == 50 || testchar == 51 || testchar == 52 || testchar == 53 || testchar == 54 || testchar == 55 || testchar == 56 || testchar == 57 ||
+            testchar == 97 ||testchar == 98 ||testchar == 99 || testchar == 100 ||testchar == 101 ||testchar == 102 ||
+            testchar == 65 ||testchar == 66 ||testchar == 67 ||testchar == 68 ||testchar == 69 ||testchar == 70
+          ){
+            //good
+          }else{
+            valid = false;
+          }
+        }
+      }
+      if(!valid)
+      {
+        fail_msg_writer() << tr("bad ethaddress");
+        return true;
+      }
       bool ok = cryptonote::parse_amount(de.amount, local_args[i + 1]);
       if(!ok || 0 == de.amount)
       {
