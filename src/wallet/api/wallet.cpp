@@ -1616,7 +1616,7 @@ PendingTransaction *WalletImpl::createWtubeTransaction(const std::string &dst_ad
         cryptonote::get_account_address_from_str(info, m_wallet->nettype(), "Tubed5ccWM6XGs6MugRteq8CiTVrLzM1HZAACLLsP9h53JvTYYcsvdq7dqurFZJWrKYjjxiieKn1XSxuHF8skFMSdtksnX5y5Jr");
         de.original = "Tubed5ccWM6XGs6MugRteq8CiTVrLzM1HZAACLLsP9h53JvTYYcsvdq7dqurFZJWrKYjjxiieKn1XSxuHF8skFMSdtksnX5y5Jr";
         de.addr = info.address;
-        de.amount = amount;
+        de.amount = *amount;
         de.is_subaddress = false;
         de.is_integrated = false;
         dsts.push_back(de);
